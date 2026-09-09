@@ -29,12 +29,18 @@ type Config struct {
 	// a tighter bucket on POST /user/login to slow credential brute-force.
 	// Burst = 2×RPS. Behind a proxy, per-IP fairness needs c.RealIP() to
 	// resolve the true client via X-Forwarded-For (Istio sets it).
-	RateLimitEnabled      bool   `envconfig:"ORBITAL_RATE_LIMIT_ENABLED"   default:"false"`
-	RateLimitRPS          int    `envconfig:"ORBITAL_RATE_LIMIT_RPS"       default:"40"`
-	LoginRateLimitRPS     int    `envconfig:"ORBITAL_LOGIN_RATE_LIMIT_RPS" default:"5"`
-	DGraphURL             string `envconfig:"DGRAPH_URL"                      default:"http://localhost:8080/graphql"`
-	DGraphAdminURL        string `envconfig:"DGRAPH_ADMIN_URL"                default:"http://localhost:8080/admin"`
-	RatelURL              string `envconfig:"RATEL_URL"                       default:"http://localhost:8000"`
+	RateLimitEnabled  bool   `envconfig:"ORBITAL_RATE_LIMIT_ENABLED"   default:"false"`
+	RateLimitRPS      int    `envconfig:"ORBITAL_RATE_LIMIT_RPS"       default:"40"`
+	LoginRateLimitRPS int    `envconfig:"ORBITAL_LOGIN_RATE_LIMIT_RPS" default:"5"`
+	DGraphURL         string `envconfig:"DGRAPH_URL"                      default:"http://localhost:8080/graphql"`
+	DGraphAdminURL    string `envconfig:"DGRAPH_ADMIN_URL"                default:"http://localhost:8080/admin"`
+	RatelURL          string `envconfig:"RATEL_URL"                       default:"http://localhost:8000"`
+	// RatelInternalURL is where orbital's own reverse proxy (see
+	// handler.RatelProxy) forwards requests under BasePath+"/dgraph" — reachable
+	// because orbital's own pod is inside the cluster, unlike RatelURL's
+	// audience (a browser, which may not be). Defaults to the local Docker
+	// Compose Ratel container so `make run-orbital` works with no extra setup.
+	RatelInternalURL      string `envconfig:"RATEL_INTERNAL_URL"              default:"http://localhost:8000"`
 	IssueTrackerURL       string `envconfig:"ORBITAL_ISSUE_TRACKER_URL"       default:"https://dev.azure.com/armadasystems/Commander/_workitems/create/Bug?[System.AreaPath]=Commander\\Edge\\Edge Platform"`
 	Dev                   bool   `envconfig:"ORBITAL_DEV"                     default:"true"`
 	LogLevel              string `envconfig:"ORBITAL_LOG_LEVEL"               default:"info"`

@@ -282,6 +282,10 @@ func New(cfg *config.Config, db *ent.Client, rawDB *sql.DB) (*Server, error) {
 	}
 
 	gql := handler.NewGraphQL(cfg.DGraphURL, db, logger, cfg.InlineSelectorReject)
+	ratelProxy, err := handler.NewRatelProxy(cfg.RatelInternalURL, logger)
+	if err != nil {
+		return nil, fmt.Errorf("construct ratel proxy: %w", err)
+	}
 	s3Configured := cfg.S3Bucket != "" && cfg.S3AccessKey != "" && cfg.S3SecretKey != ""
 	ociConfigured := cfg.OCIConfigured()
 	if !ociConfigured {
@@ -577,6 +581,8 @@ func New(cfg *config.Config, db *ent.Client, rawDB *sql.DB) (*Server, error) {
 	}
 
 	gqlGroup.Any("/graphql", gql.Handle)
+	root.Any("/dgraph", ratelProxy.Handle)
+	root.Any("/dgraph/*", ratelProxy.Handle)
 	root.GET("/swagger/*", echoswagger.WrapHandler)
 
 	var divIngester *divergenceingest.Ingester
