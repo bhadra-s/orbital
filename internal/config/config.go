@@ -35,12 +35,10 @@ type Config struct {
 	DGraphURL         string `envconfig:"DGRAPH_URL"                      default:"http://localhost:8080/graphql"`
 	DGraphAdminURL    string `envconfig:"DGRAPH_ADMIN_URL"                default:"http://localhost:8080/admin"`
 	RatelURL          string `envconfig:"RATEL_URL"                       default:"http://localhost:8000"`
-	// RatelInternalURL is where orbital's own reverse proxy (see
-	// handler.RatelProxy) forwards requests under BasePath+"/dgraph" — reachable
-	// because orbital's own pod is inside the cluster, unlike RatelURL's
-	// audience (a browser, which may not be). Defaults to the local Docker
-	// Compose Ratel container so `make run-orbital` works with no extra setup.
-	RatelInternalURL      string `envconfig:"RATEL_INTERNAL_URL"              default:"http://localhost:8000"`
+	// RatelInternalURL: handler.ReverseProxy's target for BasePath+"/dgraph".
+	RatelInternalURL string `envconfig:"RATEL_INTERNAL_URL"              default:"http://localhost:8000"`
+	// DGraphAlphaInternalURL: handler.ReverseProxy's target for BasePath+"/dgraph-alpha".
+	DGraphAlphaInternalURL string `envconfig:"DGRAPH_ALPHA_INTERNAL_URL"      default:"http://localhost:8080"`
 	IssueTrackerURL       string `envconfig:"ORBITAL_ISSUE_TRACKER_URL"       default:"https://dev.azure.com/armadasystems/Commander/_workitems/create/Bug?[System.AreaPath]=Commander\\Edge\\Edge Platform"`
 	Dev                   bool   `envconfig:"ORBITAL_DEV"                     default:"true"`
 	LogLevel              string `envconfig:"ORBITAL_LOG_LEVEL"               default:"info"`

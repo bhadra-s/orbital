@@ -282,9 +282,13 @@ func New(cfg *config.Config, db *ent.Client, rawDB *sql.DB) (*Server, error) {
 	}
 
 	gql := handler.NewGraphQL(cfg.DGraphURL, db, logger, cfg.InlineSelectorReject)
-	ratelProxy, err := handler.NewRatelProxy(cfg.RatelInternalURL, logger)
+	ratelProxy, err := handler.NewReverseProxy("/dgraph", cfg.RatelInternalURL, logger)
 	if err != nil {
 		return nil, fmt.Errorf("construct ratel proxy: %w", err)
+	}
+	dgraphAlphaProxy, err := handler.NewReverseProxy("/dgraph-alpha", cfg.DGraphAlphaInternalURL, logger)
+	if err != nil {
+		return nil, fmt.Errorf("construct dgraph alpha proxy: %w", err)
 	}
 	s3Configured := cfg.S3Bucket != "" && cfg.S3AccessKey != "" && cfg.S3SecretKey != ""
 	ociConfigured := cfg.OCIConfigured()
@@ -583,6 +587,8 @@ func New(cfg *config.Config, db *ent.Client, rawDB *sql.DB) (*Server, error) {
 	gqlGroup.Any("/graphql", gql.Handle)
 	root.Any("/dgraph", ratelProxy.Handle)
 	root.Any("/dgraph/*", ratelProxy.Handle)
+	root.Any("/dgraph-alpha", dgraphAlphaProxy.Handle)
+	root.Any("/dgraph-alpha/*", dgraphAlphaProxy.Handle)
 	root.GET("/swagger/*", echoswagger.WrapHandler)
 
 	var divIngester *divergenceingest.Ingester
