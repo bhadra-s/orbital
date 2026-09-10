@@ -585,10 +585,10 @@ func New(cfg *config.Config, db *ent.Client, rawDB *sql.DB) (*Server, error) {
 	}
 
 	gqlGroup.Any("/graphql", gql.Handle)
-	root.Any("/dgraph", ratelProxy.Handle)
-	root.Any("/dgraph/*", ratelProxy.Handle)
-	root.Any("/dgraph-alpha", dgraphAlphaProxy.Handle)
-	root.Any("/dgraph-alpha/*", dgraphAlphaProxy.Handle)
+	gqlGroup.Any("/dgraph", ratelProxy.Handle)
+	gqlGroup.Any("/dgraph/*", ratelProxy.Handle)
+	gqlGroup.Any("/dgraph-alpha", dgraphAlphaProxy.Handle)
+	gqlGroup.Any("/dgraph-alpha/*", dgraphAlphaProxy.Handle)
 	root.GET("/swagger/*", echoswagger.WrapHandler)
 
 	var divIngester *divergenceingest.Ingester
